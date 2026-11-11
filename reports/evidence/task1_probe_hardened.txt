@@ -1,0 +1,15 @@
+Probing http://127.0.0.1:3000/api/dashboard?appId=<id> with no credentials
+
+DT-2026-001  HTTP 401
+DT-2026-002  HTTP 401
+DT-2026-003  HTTP 401
+DT-2026-004  HTTP 401
+DT-2026-005  HTTP 401
+DT-2026-006  HTTP 401
+DT-2026-007  HTTP 401
+DT-2026-008  HTTP 401
+DT-2026-009  HTTP 401
+DT-2026-010  HTTP 401
+
+0 of 10 ids returned personal data without authentication.
+RESULT: no unauthenticated data exposure observed

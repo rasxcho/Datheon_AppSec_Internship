@@ -1,0 +1,19 @@
+{
+  "name": "datheon-appsec-internship",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "IDOR discovery, BOLA remediation and secure session handling - Datheon AppSec internship",
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "test": "tsx --test --test-reporter=spec \"tests/*.test.ts\"",
+    "typecheck": "tsc --noEmit",
+    "poc:idor": "tsx poc/idor_probe.ts"
+  },
+  "engines": { "node": ">=20" },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

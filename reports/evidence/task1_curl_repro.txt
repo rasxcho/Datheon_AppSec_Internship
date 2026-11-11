@@ -1,0 +1,32 @@
+$ ./scripts/curl_repro.sh
+== 1. Baseline request with NO cookie, NO Authorization header ==
+HTTP/1.1 200 OK
+cache-control: no-store
+content-type: application/json; charset=utf-8
+x-content-type-options: nosniff
+x-frame-options: DENY
+Date: Thu, 29 Oct 2026 08:45:52 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+{"appId":"DT-2026-002","ownerEmail":"bob@example.com","name":"Bob Raman","email":"bob@example.com","phone":"+91 90000 00002","notes":"Needs resubmission of ID proof"}
+== 2. Change one value: a different applicant's record ==
+{"appId":"DT-2026-003","ownerEmail":"carol@example.com","name":"Carol Nair","email":"carol@example.com","phone":"+91 90000 00003","notes":"Scholarship applicant"}
+== 3. Error message echoes the input (information leak) ==
+{"error":"No application found for appId=DT-2026-999"}
+== 4. Same request against the hardened route ==
+HTTP/1.1 401 Unauthorized
+cache-control: no-store
+content-type: application/json; charset=utf-8
+x-content-type-options: nosniff
+x-frame-options: DENY
+x-ratelimit-limit: 30
+x-ratelimit-remaining: 29
+x-ratelimit-reset: 60
+Date: Thu, 29 Oct 2026 08:45:52 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+{"error":"Authentication required"}

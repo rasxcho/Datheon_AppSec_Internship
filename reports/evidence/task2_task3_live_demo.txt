@@ -1,0 +1,29 @@
+$ curl -i -c jar.txt -X POST /api/auth/login (alice)
+HTTP/1.1 200 OK
+cache-control: no-store
+content-type: application/json; charset=utf-8
+x-content-type-options: nosniff
+x-frame-options: DENY
+x-ratelimit-limit: 5
+x-ratelimit-remaining: 4
+x-ratelimit-reset: 60
+set-cookie: dt_session=<jwt-redacted>; Path=/; HttpOnly; SameSite=Lax; Max-Age=900
+Date: Thu, 29 Oct 2026 08:45:56 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+{"user":{"email":"alice@example.com","role":"student"},"expiresInSeconds":900}
+$ curl -b jar.txt /api/dashboard?appId=DT-2026-001   (own record)
+{"appId":"DT-2026-001","name":"Alice Kumar","email":"alice@example.com","phone":"+91 90000 00001","notes":"Shortlisted for AppSec track"}
+$ curl -b jar.txt /api/dashboard?appId=DT-2026-002   (Bob record)
+HTTP/1.1 404 Not Found
+{"error":"Not found"}
+$ 7 wrong logins from one client
+HTTP/1.1 401 Unauthorized x-ratelimit-remaining: 3 
+HTTP/1.1 401 Unauthorized x-ratelimit-remaining: 2 
+HTTP/1.1 401 Unauthorized x-ratelimit-remaining: 1 
+HTTP/1.1 401 Unauthorized x-ratelimit-remaining: 0 
+HTTP/1.1 429 Too Many Requests retry-after: 60 x-ratelimit-remaining: 0 
+HTTP/1.1 429 Too Many Requests retry-after: 60 x-ratelimit-remaining: 0 
+HTTP/1.1 429 Too Many Requests retry-after: 60 x-ratelimit-remaining: 0 
