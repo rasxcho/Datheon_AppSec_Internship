@@ -56,7 +56,7 @@ paths:
       responses:
         "200": { description: The caller's own record }
         "401": { description: No valid session }
-        "404": { description: Not found, or not owned by the caller }
+        '404': { description: "Not found, or not owned by the caller" }
         "429": { description: Rate limit exceeded }
 components:
   securitySchemes:
