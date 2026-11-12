@@ -1,0 +1,63 @@
+openapi: 3.0.3
+info:
+  title: Datheon AppSec Lab API
+  version: 1.0.0
+  description: Public certificate verification (masked PII) and authenticated dashboard. All data is fictional.
+  license: { name: MIT, url: "https://opensource.org/licenses/MIT" }
+servers:
+  - url: http://127.0.0.1:3000
+paths:
+  /api/health:
+    get:
+      operationId: health
+      summary: Liveness check
+      tags: [system]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: object, properties: { status: { type: string } } } } } }
+  /api/public/verify:
+    get:
+      operationId: verifyCertificate
+      summary: Verify a certificate without logging in (PII is masked)
+      tags: [public]
+      parameters:
+        - name: certId
+          in: query
+          required: true
+          schema: { type: string, pattern: "^DT-CERT-[A-Z0-9]{8}$", example: DT-CERT-7F3K9Q2M }
+      responses:
+        "200":
+          description: Verification result with masked holder details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid: { type: boolean }
+                  certificateId: { type: string }
+                  status: { type: string, enum: [issued, revoked] }
+                  program: { type: string }
+                  issuedOn: { type: string }
+                  holder: { type: string, example: "A*** K***" }
+                  email: { type: string, example: "a***e@example.com" }
+                  phone: { type: string, example: "+** ***** ***01" }
+        "404": { description: Unknown or malformed id (identical body for both) }
+        "429": { description: Rate limit exceeded }
+  /api/dashboard:
+    get:
+      operationId: getDashboard
+      summary: Authenticated record lookup (owner only)
+      tags: [private]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: appId
+          in: query
+          required: true
+          schema: { type: string, pattern: "^DT-\\d{4}-\\d{3}$" }
+      responses:
+        "200": { description: The caller's own record }
+        "401": { description: No valid session }
+        "404": { description: Not found, or not owned by the caller }
+        "429": { description: Rate limit exceeded }
+components:
+  securitySchemes:
+    sessionCookie: { type: apiKey, in: cookie, name: dt_session }

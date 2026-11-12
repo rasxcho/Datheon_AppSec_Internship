@@ -1,0 +1,7 @@
+extends: ["spectral:oas"]
+rules:
+  # Fail the build if an operation is exposed without a description of what it does or who may call it.
+  operation-description: off
+  operation-operationId: error
+  operation-tags: error
+  oas3-api-servers: error

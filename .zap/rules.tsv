@@ -1,0 +1,2 @@
+# ZAP baseline rule overrides: id<TAB>action<TAB>reason. WARN keeps the rule visible without failing the build.
+10049	IGNORE	Storable/cacheable content: the public verify endpoint is intentionally cacheable for 60 s and contains only masked data

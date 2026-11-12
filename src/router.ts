@@ -4,6 +4,8 @@ import { vulnerableDashboardHandler } from "./lab/vulnerableDashboard.js";
 import { authHandlers } from "./routes/auth.js";
 import { dashboardHandler } from "./routes/dashboard.js";
 import { dashboardPage } from "./routes/page.js";
+import { publicVerifyHandler } from "./routes/publicVerify.js";
+import { applySecurityHeaders } from "./lib/securityHeaders.js";
 
 type Handler = (request: Request) => Promise<Response>;
 
@@ -20,6 +22,7 @@ export function createRouter(deps: Deps): (request: Request) => Promise<Response
     "/api/auth/logout": { POST: auth.logout },
     "/api/auth/me": { GET: auth.me },
     "/api/dashboard": { GET: dashboardHandler(deps) },
+    "/api/public/verify": { GET: publicVerifyHandler(deps) },
     "/dashboard": { GET: dashboardPage("/api/dashboard", "My application (secured)") },
   };
   if (deps.enableVulnerableLab) {
@@ -28,6 +31,10 @@ export function createRouter(deps: Deps): (request: Request) => Promise<Response
   }
 
   return async function route(request: Request): Promise<Response> {
+    return applySecurityHeaders(await dispatch(request));
+  };
+
+  async function dispatch(request: Request): Promise<Response> {
     try {
       const { pathname } = new URL(request.url);
       const methods = routes[pathname];
@@ -38,5 +45,5 @@ export function createRouter(deps: Deps): (request: Request) => Promise<Response
     } catch {
       return json(500, { error: "Internal server error" }); // log server-side; never return stack traces or DB details
     }
-  };
+  }
 }

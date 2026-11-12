@@ -1,0 +1,44 @@
+name: security
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  secrets-and-spec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }   # gitleaks scans history, not just the tip
+      - name: Scan for committed secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Lint the OpenAPI contract
+        run: npx --yes @stoplight/spectral-cli@6 lint openapi.yaml --fail-severity=error
+
+  dast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install
+      - name: Start the API
+        run: |
+          nohup npm start > server.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:3000/api/health && break; sleep 1; done
+      - name: Fail on missing or broken security headers
+        run: scripts/check_headers.sh http://127.0.0.1:3000
+      - name: OWASP ZAP API scan (OpenAPI)
+        run: |
+          mkdir -p zap-out && chmod 777 zap-out && cp openapi.yaml zap-out/ && cp .zap/rules.tsv zap-out/
+          docker run --rm --network host -v "$PWD/zap-out:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy:stable \
+            zap-api-scan.py -t openapi.yaml -f openapi -r zap-report.html -c rules.tsv -I
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: zap-report, path: zap-out/zap-report.html }
+      - name: Server log on failure
+        if: failure()
+        run: cat server.log

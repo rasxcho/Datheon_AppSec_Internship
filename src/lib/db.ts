@@ -9,6 +9,14 @@ export interface Student {
   notes: string;
 }
 
+export interface Certificate {
+  certId: string;      // public, unguessable-enough identifier printed on the certificate
+  appId: string;       // internal link to the student record - never returned publicly
+  program: string;
+  issuedOn: string;
+  status: "issued" | "revoked";
+}
+
 export interface User {
   email: string;
   role: "student" | "staff";
@@ -17,7 +25,7 @@ export interface User {
 
 /** In-memory stand-in for a real database. All data is fictional. */
 export class Database {
-  constructor(readonly students: Student[], readonly users: User[]) {}
+  constructor(readonly students: Student[], readonly users: User[], readonly certificates: Certificate[] = []) {}
 
   /** UNSAFE pattern: any caller-supplied id reads any row. Used by the vulnerable lab route only. */
   findByAppId(appId: string): Student | undefined {
@@ -27,6 +35,10 @@ export class Database {
   /** SAFE pattern: SELECT ... WHERE app_id = $1 AND owner_email = $2 */
   findByAppIdForOwner(appId: string, ownerEmail: string): Student | undefined {
     return this.students.find((s) => s.appId === appId && s.ownerEmail === ownerEmail);
+  }
+
+  findCertificate(certId: string): Certificate | undefined {
+    return this.certificates.find((c) => c.certId === certId);
   }
 
   findUser(email: string): User | undefined {
@@ -48,6 +60,11 @@ export function seedDatabase(): Database {
     [
       { email: "alice@example.com", role: "student", passwordHash: hashPassword(LAB_PASSWORDS["alice@example.com"]) },
       { email: "bob@example.com", role: "student", passwordHash: hashPassword(LAB_PASSWORDS["bob@example.com"]) },
+    ],
+    [
+      { certId: "DT-CERT-7F3K9Q2M", appId: "DT-2026-001", program: "Application Security Internship", issuedOn: "2026-10-01", status: "issued" },
+      { certId: "DT-CERT-4B8N1X6D", appId: "DT-2026-002", program: "Application Security Internship", issuedOn: "2026-10-01", status: "issued" },
+      { certId: "DT-CERT-9H2T5W0R", appId: "DT-2026-003", program: "Application Security Internship", issuedOn: "2026-10-01", status: "revoked" },
     ],
   );
 }

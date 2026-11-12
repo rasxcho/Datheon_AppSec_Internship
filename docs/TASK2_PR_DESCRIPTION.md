@@ -12,7 +12,9 @@ Handler order in `src/routes/dashboard.ts`:
 |---|---|---|
 | 1 | Sliding-window throttle (30 req/min/IP) | 429 + `Retry-After` |
 | 2 | Identity from the signed, unexpired, unrevoked session cookie only | 401 |
-| 3 | `appId` must match `^DT-\d{4}-\d{3}$` | 404 |
+| 3 | `appId` must match `^DT-\d{4}-\dgit switch main
+git pull
+{3}$` | 404 |
 | 4 | Query by `appId` **and** session owner (`findByAppIdForOwner`) | 404 (same body as a missing record) |
 | 5 | Return only `appId, name, email, phone, notes` | - |
 
