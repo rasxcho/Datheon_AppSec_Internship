@@ -73,6 +73,15 @@ git push -u origin main fix/task2-bola-authorization    # then open the PR on Gi
 | Public verify response | n/a | masked name/email/phone only (`a***e@example.com`) |
 | Security headers on 401/404/405/500 | partial | CSP, HSTS, nosniff, X-Frame-Options, Referrer-Policy, Permissions-Policy on all |
 
+## Evidence
+
+| Task | Report | Screenshots |
+|---|---|---|
+| 1 | [Task 1 report](reports/TASK1_VULNERABILITY_DISCLOSURE_REPORT.md) | `reports/screenshots/task1_*.png` |
+| 2 | [PR description](docs/TASK2_PR_DESCRIPTION.md), [diff](docs/TASK2_PR.diff) | `reports/screenshots/task2_*.png` |
+| 3 | [Task 3 and 4 report](reports/TASK3_TASK4_REPORT.md) | `task3_rotation.png`, `task3_logout_replay.png`, `task3_rate_limit.png` |
+| 4 | [Task 3 and 4 report](reports/TASK3_TASK4_REPORT.md) | `task4_tests.png`, `task4_public_masked.png`, `task4_revoked.png`, `task4_headers_on_404.png`, `task4_header_gate.png`, `task4_actions_green.png`, `task4_security_jobs_green.png`, `task4_negative_test_red.png` |
+
 ## Honest notes
 - Tests use Node's built-in runner (`node:test`) with Vitest-style `describe/it`; porting to Vitest/Jest is an import change only.
 - The Task 4 GitHub Actions workflow (`security.yml`) has not run on GitHub yet; the tests and header gate were run locally.
